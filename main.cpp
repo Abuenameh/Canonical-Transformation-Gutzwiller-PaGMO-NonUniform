@@ -645,7 +645,8 @@ int main(int argc, char** argv) {
         double muwidth = 0.1;
         queue<Point> points;
         for (int ix = 0; ix < nx; ix++) {
-            double mu0 = x[ix] / 1e12 + 0.05;
+//            double mu0 = x[ix] / 1e12 + 0.05;
+            double mu0 = 7.142857142857143e-13*x[ix] + 0.08571428571428572;
             double mui = max(mumin, mu0 - muwidth);
             double muf = min(mumax, mu0 + muwidth);
             deque<double> mu(nmu);
@@ -665,7 +666,8 @@ int main(int argc, char** argv) {
             }
         }
         for (int ix = 0; ix < nx; ix++) {
-            double mu0 = -3*x[ix] / 1e12 + 0.96;
+//            double mu0 = -3*x[ix] / 1e12 + 0.96;
+            double mu0 = -2.142857142857143e-12*x[ix] + 0.942857142857143;
             double mui = max(mumin, mu0 - muwidth);
             double muf = min(mumax, mu0 + muwidth);
             deque<double> mu(nmu);
