@@ -642,7 +642,7 @@ int main(int argc, char** argv) {
 //        progress_display progress(nx * nmu);
 
         //        cout << "Queueing" << endl;
-        double muwidth = 0.2;
+        double muwidth = 0.1;
         queue<Point> points;
         for (int ix = 0; ix < nx; ix++) {
 //            double mu0 = x[ix] / 1e12 + 0.05;
