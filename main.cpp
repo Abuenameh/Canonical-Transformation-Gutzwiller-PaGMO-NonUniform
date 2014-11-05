@@ -228,11 +228,12 @@ void phasepoints(Parameter& xi, phase_parameters pparms, queue<Point>& points, v
         pointRes.U = U;
 
         nlopt::opt localopt(nlopt::LD_LBFGS, ndim);
-        //        nlopt::opt localopt(nlopt::LD_MMA, ndim);
-        //        nlopt::opt localopt(nlopt::LN_NELDERMEAD, ndim);
+//                nlopt::opt localopt(nlopt::LD_MMA, ndim);
+//                nlopt::opt localopt(nlopt::LN_COBYLA, ndim);
         localopt.set_lower_bounds(-1);
         localopt.set_upper_bounds(1);
         localopt.set_min_objective(energyfunc, &fdata);
+//        localopt.set_vector_storage(11);
         //        localopt.set_ftol_rel(1e-14);
         //        localopt.set_xtol_rel(1e-14);
         //        localopt.set_ftol_abs(1e-12);
@@ -639,63 +640,75 @@ int main(int argc, char** argv) {
         //        fresults fres = {fminres, fn0res, fmaxres, f0res, fthres, f2thres, f2thres};
         //        results results = {E0res, Ethres, E2thres, E2thres, fsres, res0, resth, res2th, res2th, Jres, Ures};
 
-//        progress_display progress(nx * nmu);
+        //        progress_display progress(nx * nmu);
 
         //        cout << "Queueing" << endl;
         double muwidth = 0.1;
         queue<Point> points;
-        for (int ix = 0; ix < nx; ix++) {
-//            double mu0 = x[ix] / 1e12 + 0.05;
-            double mu0 = 7.142857142857143e-13*x[ix] + 0.08571428571428572;
-            double mui = max(mumin, mu0 - muwidth);
-            double muf = min(mumax, mu0 + muwidth);
-            deque<double> mu(nmu);
-            if (nmu == 1) {
-                mu[0] = mui;
-            } else {
-                double dmu = (muf - mui) / (nmu - 1);
+        bool sample = true;
+        if (sample) {
+            for (int ix = 0; ix < nx; ix++) {
+                //            double mu0 = x[ix] / 1e12 + 0.05;
+                double mu0 = 7.142857142857143e-13 * x[ix] + 0.08571428571428572;
+                double mui = max(mumin, mu0 - muwidth);
+                double muf = min(mumax, mu0 + muwidth);
+                deque<double> mu(nmu);
+                if (nmu == 1) {
+                    mu[0] = mui;
+                } else {
+                    double dmu = (muf - mui) / (nmu - 1);
+                    for (int imu = 0; imu < nmu; imu++) {
+                        mu[imu] = mui + imu * dmu;
+                    }
+                }
                 for (int imu = 0; imu < nmu; imu++) {
-                    mu[imu] = mui + imu * dmu;
+                    Point point;
+                    point.x = x[ix];
+                    point.mu = mu[imu];
+                    points.push(point);
                 }
             }
-            for (int imu = 0; imu < nmu; imu++) {
-                Point point;
-                point.x = x[ix];
-                point.mu = mu[imu];
-                points.push(point);
-            }
-        }
-        for (int ix = 0; ix < nx; ix++) {
-//            double mu0 = -3*x[ix] / 1e12 + 0.96;
-            double mu0 = -2.142857142857143e-12*x[ix] + 0.942857142857143;
-            double mui = max(mumin, mu0 - muwidth);
-            double muf = min(mumax, mu0 + muwidth);
-            deque<double> mu(nmu);
-            if (nmu == 1) {
-                mu[0] = mui;
-            } else {
-                double dmu = (muf - mui) / (nmu - 1);
+            for (int ix = 0; ix < nx; ix++) {
+                //            double mu0 = -3*x[ix] / 1e12 + 0.96;
+                double mu0 = -2.142857142857143e-12 * x[ix] + 0.942857142857143;
+                double mui = max(mumin, mu0 - muwidth);
+                double muf = min(mumax, mu0 + muwidth);
+                deque<double> mu(nmu);
+                if (nmu == 1) {
+                    mu[0] = mui;
+                } else {
+                    double dmu = (muf - mui) / (nmu - 1);
+                    for (int imu = 0; imu < nmu; imu++) {
+                        mu[imu] = mui + imu * dmu;
+                    }
+                }
                 for (int imu = 0; imu < nmu; imu++) {
-                    mu[imu] = mui + imu * dmu;
+                    Point point;
+                    point.x = x[ix];
+                    point.mu = mu[imu];
+                    points.push(point);
                 }
             }
+        } else {
             for (int imu = 0; imu < nmu; imu++) {
-                Point point;
-                point.x = x[ix];
-                point.mu = mu[imu];
-                points.push(point);
+                for (int ix = 0; ix < nx; ix++) {
+                    Point point;
+                    point.x = x[ix];
+                    point.mu = mu[imu];
+                    points.push(point);
+                }
             }
         }
         progress_display progress(points.size());
-//        for (int imu = 0; imu < nmu; imu++) {
-//            queue<Point> rowpoints;
-//            for (int ix = 0; ix < nx; ix++) {
-//                Point point;
-//                point.x = x[ix];
-//                point.mu = mu[imu];
-//                points.push(point);
-//            }
-//        }
+        //        for (int imu = 0; imu < nmu; imu++) {
+        //            queue<Point> rowpoints;
+        //            for (int ix = 0; ix < nx; ix++) {
+        //                Point point;
+        //                point.x = x[ix];
+        //                point.mu = mu[imu];
+        //                points.push(point);
+        //            }
+        //        }
 
         phase_parameters parms;
         parms.theta = theta;
